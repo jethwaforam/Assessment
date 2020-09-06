@@ -17,7 +17,27 @@ namespace PromotionEngineApi.Controllers
         {
             decimal total = 0;
             var products = ProductMaster.GetProducts();
-            var productOffers = PromotionOfferMaster.GetProductOffers();                        
+            var productOffers = PromotionOfferMaster.GetProductOffers();
+            foreach (var item in selectedProducts)
+            {
+               
+                    var availableOffers = productOffers.Where(s => s.BaseProductId == item.ProductId);
+                    if (availableOffers.Any())
+                    {
+                       
+                    }
+                    else
+                    {
+                        var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
+                        if (productDetail != null)
+                        {
+                            var cost = item.Quantity * productDetail.ProductPrice;
+                            total += cost;
+
+                        }
+                    }
+                
+            }
             return total;
         }                 
     }
