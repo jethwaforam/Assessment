@@ -18,56 +18,80 @@ namespace PromotionEngineApi.Controllers
             decimal total = 0;
             var products = ProductMaster.GetProducts();
             var productOffers = PromotionOfferMaster.GetProductOffers();
-
+           
             foreach (var item in selectedProducts)
             {
-
-                var availableOffers = productOffers.Where(s => s.BaseProductId == item.ProductId);
-                if (availableOffers.Any())
-                {
-                    foreach (var availableOffer in availableOffers)
+                
+                    var availableOffers = productOffers.Where(s => s.BaseProductId == item.ProductId);
+                    if (availableOffers.Any())
                     {
-                        if (availableOffer.Products.Count > 1)
+                        foreach (var availableOffer in availableOffers)
                         {
-                            
-                        }
-                        else
-                        {
-                            var applicableOffer = availableOffer.Products.FirstOrDefault(s => s.Quantity <= item.Quantity);
-                            if (applicableOffer != null)
+                            if (availableOffer.Products.Count > 1)
                             {
-                                var noOfApplicableOffers = item.Quantity / applicableOffer.Quantity;
-                                var remainingQuantity = item.Quantity % applicableOffer.Quantity;
-                                var productDetail = products.Find(s => s.ProductId == item.ProductId);
-                                var cost = (noOfApplicableOffers * availableOffer.OfferPrice) + (remainingQuantity * productDetail.ProductPrice);
-                                total += cost;
+                                var applicableOffer = availableOffer.Products.FirstOrDefault(s => s.ProductId == item.ProductId &&
+                                s.Quantity <= item.Quantity);
+                                if (applicableOffer != null)
+                                {
+                                    var selectedProductIds = selectedProducts.Select(s => s.ProductId);
+                                    var otherOfferProducts = availableOffer.Products.Where(s => s.ProductId != item.ProductId &&
+                                     selectedProductIds.Contains(s.ProductId));
+                                   
+                                    if (otherOfferProducts.Any())
+                                    {
+                                        
+                                    }
+                                    else
+                                    {
+                                        var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
+                                        if (productDetail != null)
+                                        {
+                                            var cost = item.Quantity * productDetail.ProductPrice;
+                                            total += cost;
+                                          
 
+                                        }
+                                    }
+                                }
                             }
                             else
                             {
-                                var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
-                                if (productDetail != null)
+                                var applicableOffer = availableOffer.Products.FirstOrDefault(s => s.Quantity <= item.Quantity);
+                                if (applicableOffer != null)
                                 {
-                                    var cost = item.Quantity * productDetail.ProductPrice;
+                                    var noOfApplicableOffers = item.Quantity / applicableOffer.Quantity;
+                                    var remainingQuantity = item.Quantity % applicableOffer.Quantity;
+                                    var productDetail = products.Find(s => s.ProductId == item.ProductId);
+                                    var cost = (noOfApplicableOffers * availableOffer.OfferPrice) + (remainingQuantity * productDetail.ProductPrice);
                                     total += cost;
+
                                 }
+                                else
+                                {
+                                    var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
+                                    if (productDetail != null)
+                                    {
+                                        var cost = item.Quantity * productDetail.ProductPrice;
+                                        total += cost;
+                                    }
+                                }
+
                             }
+                            
+                        }
+
+                    }
+                    else
+                    {
+                        var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
+                        if (productDetail != null)
+                        {
+                            var cost = item.Quantity * productDetail.ProductPrice;
+                            total += cost;
 
                         }
-                        
                     }
-
-                }
-                else
-                {
-                    var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
-                    if (productDetail != null)
-                    {
-                        var cost = item.Quantity * productDetail.ProductPrice;
-                        total += cost;                        
-                    }
-                }
-
+                
             }
             return total;
 

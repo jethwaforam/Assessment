@@ -25,5 +25,24 @@ namespace PromotionEngineTest
             };
             return list;
         }
+        [Fact]
+        public void SingleProductPromotionApply()
+        {
+            var _controller = new PromotionEngineController();
+            var selectedProducts = SingleProductPromotionData();
+            var result = _controller.ApplyPromotionOffer(selectedProducts);
+            Assert.Equal(370, result);
+        }
+
+        private List<Products> SingleProductPromotionData()
+        {
+            var list = new List<Products>
+            {
+                new Products {ProductId=1, ProductName="A", Quantity=5},
+                new Products {ProductId=2, ProductName="B", Quantity=5},
+                new Products {ProductId=3, ProductName="C", Quantity=1},
+            };
+            return list;
+        }
     }
 }
