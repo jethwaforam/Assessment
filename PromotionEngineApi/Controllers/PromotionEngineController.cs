@@ -1,5 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using PromotionEngineApi.Helper;
 using PromotionEngineApi.Model;
 
 namespace PromotionEngineApi.Controllers
@@ -9,8 +14,11 @@ namespace PromotionEngineApi.Controllers
     public class PromotionEngineController : Controller
     {
         public decimal ApplyPromotionOffer(List<Products> selectedProducts)
-        {                        
-            return 0;
+        {
+            decimal total = 0;
+            var products = ProductMaster.GetProducts();
+            var productOffers = PromotionOfferMaster.GetProductOffers();                        
+            return total;
         }                 
     }
 }
