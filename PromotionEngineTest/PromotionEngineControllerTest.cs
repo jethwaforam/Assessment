@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using PromotionEngineApi.Controllers;
 using PromotionEngineApi.Model;
@@ -44,6 +45,7 @@ namespace PromotionEngineTest
             };
             return list;
         }
+
         [Fact]
         public void ComboProductPromotionApply()
         {
@@ -61,6 +63,27 @@ namespace PromotionEngineTest
                 new Products {ProductId=2, ProductName="B", Quantity=5},
                 new Products {ProductId=3, ProductName="C", Quantity=1},
                 new Products {ProductId=4, ProductName="D", Quantity=1},
+            };
+            return list;
+        }
+
+        [Fact]
+        public void MultiComboProductPromotionApply()
+        {
+            var _controller = new PromotionEngineController();
+            var selectedProducts = MultiComboProductPromotionData();
+            var result = _controller.ApplyPromotionOffer(selectedProducts);
+            Assert.Equal(310, result);
+        }
+
+        private List<Products> MultiComboProductPromotionData()
+        {
+            var list = new List<Products>
+            {
+                new Products {ProductId=1, ProductName="A", Quantity=3},
+                new Products {ProductId=2, ProductName="B", Quantity=5},
+                new Products {ProductId=3, ProductName="C", Quantity=2},
+                new Products {ProductId=4, ProductName="D", Quantity=2},
             };
             return list;
         }

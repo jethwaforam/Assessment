@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using PromotionEngineApi.Helper;
 using PromotionEngineApi.Model;
@@ -14,10 +17,12 @@ namespace PromotionEngineApi.Controllers
         {
             decimal total = 0;
             var products = ProductMaster.GetProducts();
-            var productOffers = PromotionOfferMaster.GetProductOffers();           
+            var productOffers = PromotionOfferMaster.GetProductOffers();
+            var processedProducts = new List<int>();
             foreach (var item in selectedProducts)
             {
-                
+                if (!processedProducts.Contains(item.ProductId))
+                {
                     var availableOffers = productOffers.Where(s => s.BaseProductId == item.ProductId);
                     if (availableOffers.Any())
                     {
@@ -56,7 +61,6 @@ namespace PromotionEngineApi.Controllers
                                                 remainingQuantity = otherSelectedProducts.Quantity >= otherOfferProd.Quantity * minAllowedOffer ?
                                                         otherSelectedProducts.Quantity - otherOfferProd.Quantity * minAllowedOffer
                                                         : otherSelectedProducts.Quantity;
-                                                //var remainingQuantity = otherSelectedProducts.Quantity % otherOfferProd.Quantity;
                                                 var productDetail = products.Find(s => s.ProductId == otherOfferProd.ProductId);
                                                 var cost = remainingQuantity * productDetail.ProductPrice;
                                                 comboTotal += cost;
@@ -67,8 +71,7 @@ namespace PromotionEngineApi.Controllers
                                         }
                                         if (flag)
                                         {
-                                            // var noOfApplicableOffers = item.Quantity / applicableOffer.Quantity;
-                                            //var remainingQuantity = item.Quantity % applicableOffer.Quantity;
+
                                             var remainingQuantity = item.Quantity >= applicableOffer.Quantity * minAllowedOffer ?
                                                          item.Quantity - applicableOffer.Quantity * minAllowedOffer
                                                          : item.Quantity;
@@ -77,7 +80,8 @@ namespace PromotionEngineApi.Controllers
                                             comboTotal += cost;
                                             total += comboTotal;
                                             var processedItem = otherOfferProducts.Select(s => s.ProductId);
-                                           
+                                            processedProducts.AddRange(processedItem);
+                                            processedProducts.Add(item.ProductId);
 
                                         }
                                         else
@@ -86,7 +90,8 @@ namespace PromotionEngineApi.Controllers
                                             if (productDetail != null)
                                             {
                                                 var cost = item.Quantity * productDetail.ProductPrice;
-                                                total += cost;                                             
+                                                total += cost;
+                                                processedProducts.Add(item.ProductId);
 
                                             }
                                         }
@@ -99,7 +104,8 @@ namespace PromotionEngineApi.Controllers
                                         {
                                             var cost = item.Quantity * productDetail.ProductPrice;
                                             total += cost;
-                                          
+                                            processedProducts.Add(item.ProductId);
+
                                         }
                                     }
                                 }
@@ -125,8 +131,10 @@ namespace PromotionEngineApi.Controllers
                                         total += cost;
                                     }
                                 }
+                                processedProducts.Add(item.ProductId);
 
                             }
+                            if (processedProducts.Contains(item.ProductId)) break;
                         }
 
                     }
@@ -137,13 +145,13 @@ namespace PromotionEngineApi.Controllers
                         {
                             var cost = item.Quantity * productDetail.ProductPrice;
                             total += cost;
+                            processedProducts.Add(item.ProductId);
 
                         }
                     }
-               
+                }
             }
             return total;
-
         }
     }
 }
