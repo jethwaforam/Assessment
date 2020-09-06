@@ -35,7 +35,12 @@ namespace PromotionEngineApi.Controllers
                         {
                             var applicableOffer = availableOffer.Products.FirstOrDefault(s => s.Quantity <= item.Quantity);
                             if (applicableOffer != null)
-                            {                               
+                            {
+                                var noOfApplicableOffers = item.Quantity / applicableOffer.Quantity;
+                                var remainingQuantity = item.Quantity % applicableOffer.Quantity;
+                                var productDetail = products.Find(s => s.ProductId == item.ProductId);
+                                var cost = (noOfApplicableOffers * availableOffer.OfferPrice) + (remainingQuantity * productDetail.ProductPrice);
+                                total += cost;
 
                             }
                             else
