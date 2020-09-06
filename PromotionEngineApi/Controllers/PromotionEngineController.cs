@@ -18,27 +18,54 @@ namespace PromotionEngineApi.Controllers
             decimal total = 0;
             var products = ProductMaster.GetProducts();
             var productOffers = PromotionOfferMaster.GetProductOffers();
+
             foreach (var item in selectedProducts)
             {
-               
-                    var availableOffers = productOffers.Where(s => s.BaseProductId == item.ProductId);
-                    if (availableOffers.Any())
+
+                var availableOffers = productOffers.Where(s => s.BaseProductId == item.ProductId);
+                if (availableOffers.Any())
+                {
+                    foreach (var availableOffer in availableOffers)
                     {
-                       
-                    }
-                    else
-                    {
-                        var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
-                        if (productDetail != null)
+                        if (availableOffer.Products.Count > 1)
                         {
-                            var cost = item.Quantity * productDetail.ProductPrice;
-                            total += cost;
+                            
+                        }
+                        else
+                        {
+                            var applicableOffer = availableOffer.Products.FirstOrDefault(s => s.Quantity <= item.Quantity);
+                            if (applicableOffer != null)
+                            {                               
+
+                            }
+                            else
+                            {
+                                var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
+                                if (productDetail != null)
+                                {
+                                    var cost = item.Quantity * productDetail.ProductPrice;
+                                    total += cost;
+                                }
+                            }
 
                         }
+                        
                     }
-                
+
+                }
+                else
+                {
+                    var productDetail = products.FirstOrDefault(s => s.ProductId == item.ProductId);
+                    if (productDetail != null)
+                    {
+                        var cost = item.Quantity * productDetail.ProductPrice;
+                        total += cost;                        
+                    }
+                }
+
             }
             return total;
-        }                 
+
+        }
     }
 }
