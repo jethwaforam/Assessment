@@ -44,5 +44,25 @@ namespace PromotionEngineTest
             };
             return list;
         }
+        [Fact]
+        public void ComboProductPromotionApply()
+        {
+            var _controller = new PromotionEngineController();
+            var selectedProducts = ComboProductPromotionData();
+            var result = _controller.ApplyPromotionOffer(selectedProducts);
+            Assert.Equal(280, result);
+        }
+
+        private List<Products> ComboProductPromotionData()
+        {
+            var list = new List<Products>
+            {
+                new Products {ProductId=1, ProductName="A", Quantity=3},
+                new Products {ProductId=2, ProductName="B", Quantity=5},
+                new Products {ProductId=3, ProductName="C", Quantity=1},
+                new Products {ProductId=4, ProductName="D", Quantity=1},
+            };
+            return list;
+        }
     }
 }
